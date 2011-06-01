@@ -38,7 +38,7 @@ class LogLevel
 };
 
 /**
- * 
+ *
  */
 class LogMessage
 {
@@ -48,6 +48,9 @@ class LogMessage
 
   public:
     LogMessage(std::string message, LogLevel level) : _Message(message), _MessageLevel(level) { }
+    std::string getMessage() const { return _Message; }
+    LogLevel getLevel() const { return _MessageLevel; }
+    unsigned int const getMessagePriority() const { return _MessageLevel.getPriority(); }
 };
 
 /**
@@ -62,9 +65,15 @@ class LogManager
   private:
     LevelList _Levels;
     LogFacilityList _Listeners;
+    static LogManager* _ptr;
+
+   /**
+    * Private constructor. Is a Singleton.
+    */
+    LogManager();
+    LogManager(const LogManager& p);
 
   public:
-    LogManager();
 
 // Manage LogLevel List
    /**
@@ -76,7 +85,7 @@ class LogManager
     */
     void addLogLevel(std::string name, std::string abbr = "");
    /**
-    * Sets the LevelList to a certain level list created by 
+    * Sets the LevelList to a certain level list created by
     * the user by hand.
     */
     void _setLogLevelList(LevelList levelList) { _Levels = levelList; }
@@ -104,6 +113,10 @@ class LogManager
    /**
     * Publish message to a certain facility.
     */
+    void addLogMessageTo(LogMessage* message, LogFacilityProvider* facility);
+   /**
+    * Publish message to a certain facility.
+    */
     void addLogMessageTo(std::string message, unsigned int level, LogFacilityProvider* facility);
 
 // Manage log facilities
@@ -111,6 +124,11 @@ class LogManager
     * Register a LogFacilityProvider
     */
     void _registerLogFacilityProvider(LogFacilityProvider* facility);
+
+// Static memebers
+    static void create() { _ptr = new LogManager(); }
+    static LogManager* getSingletonPtr() { return _ptr; }
+    static void destroy() { delete _ptr; }
 };
 
 #endif
