@@ -1,0 +1,7 @@
+This project is released under MIT License. 
+
+NewLogger v0.0
+Author: Miguel Bernabeu Diaz <miguelbernadi@gmail.com>
+
+Simple to use light logging facility to be embedded in 
+other c++ programs.
