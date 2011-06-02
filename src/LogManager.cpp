@@ -1,4 +1,5 @@
 #include <LogManager.h>
+#include <LogFacilityProvider.h>
 
 LogManager::LogManager()
 {
@@ -12,7 +13,7 @@ LogManager::LogManager()
     * @param abbr Abbreviation of the level's string representation.
     *             Default to empty string.
     */
-void LogManager::addLogLevel(std::string name, std::string abbr = "")
+void LogManager::addLogLevel(std::string name, std::string abbr)
 {
     unsigned int tmp;
     if( _Levels.empty() )
@@ -23,7 +24,7 @@ void LogManager::addLogLevel(std::string name, std::string abbr = "")
     {
         tmp = _Levels.size() - 1;
     }
-    _Levels[tmp] = LogLevel(tmp, name, abbr);
+    _Levels[tmp] = new LogLevel(tmp, name, abbr);
 }
 
    /**
@@ -31,7 +32,7 @@ void LogManager::addLogLevel(std::string name, std::string abbr = "")
     * @param level LogLevel priority.
     * @return Registered LogLevel of specified priority.
     */
-LogLevel const LogManager::getLogLevelByPriority(unsigned int level) const
+LogLevel* const LogManager::getLogLevelByPriority(unsigned int level) const
 {
     return _Levels.find(level)->second;
 }
@@ -52,16 +53,16 @@ unsigned int LogManager::getLeastPriorityLevel() const
     */
 void LogManager::addLogMessage(LogMessage* message)
 {
-    for(LogFacilityList::iterator it = _Listeners.begin(), it != _Listeners.end(), ++it)
+    for(LogFacilityList::iterator it = _Listeners.begin(); it != _Listeners.end(); ++it)
     {
-        it->printMessage(message);
+        (*it)->printMessage(message);
     }
 }
 
    /**
     * Publish message to all log facilities.
     */
-void LogManager::addLogMessage(std::string message, unsigned int level)
+void LogManager::addLogMessage(std::string message, LogLevel level)
 {
     this->addLogMessage( new LogMessage(message, level) );
 }
@@ -77,7 +78,7 @@ void LogManager::addLogMessageTo(LogMessage* message, LogFacilityProvider* facil
    /**
     * Publish message to a certain facility.
     */
-void LogManager::addLogMessageTo(std::string message, unsigned int level, LogFacilityProvider* facility)
+void LogManager::addLogMessageTo(std::string message, LogLevel level, LogFacilityProvider* facility)
 {
     this->addLogMessageTo(new LogMessage(message, level), facility);
 }

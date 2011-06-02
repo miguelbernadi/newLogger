@@ -3,11 +3,14 @@
 
 #include <string>
 #include <map>
+#include <vector>
+//#include <memory>
 
 // Forward declarations.
 class LogFacilityProvider;
+class LogLevel;
 
-typedef std::map< unsigned int, LogLevel > LevelList;
+typedef std::map< unsigned int, LogLevel* > LevelList;
 
 /**
  * Defines a numeric level for comparison (should be unique) and associates it
@@ -19,18 +22,18 @@ class LogLevel
    /**
     * Needed for message filtering.
     */
-    unsigned int const _LevelPriority;
+    unsigned int _LevelPriority;
    /**
     * String displayed on log entries of this level.
     */
-    std::string const _LevelName;
+    std::string _LevelName;
    /**
     * String abbreviation displayed on log entries of this level.
     */
-    std::string const _LevelAbbr;
+    std::string _LevelAbbr;
   public:
     LogLevel(int number, std::string name, std::string abbr) : _LevelPriority(number), _LevelName(name), _LevelAbbr(abbr) { }
-    unsigned int const getPriority() const { return _LevelNumber; }
+    unsigned int getPriority() const { return _LevelPriority; }
     std::string getName() const { return _LevelName; }
     std::string getAbbr() const { return _LevelAbbr; }
 
@@ -44,7 +47,7 @@ class LogMessage
 {
   private:
     std::string const _Message;
-    LogLevel _MessageLevel;
+    LogLevel const _MessageLevel;
 
   public:
     LogMessage(std::string message, LogLevel level) : _Message(message), _MessageLevel(level) { }
@@ -61,11 +64,14 @@ class LogManager
 {
   public:
     typedef std::vector< LogFacilityProvider* > LogFacilityList;
+//    typedef std::auto_ptr< LogManager > LogManagerPtr;
+    typedef LogManager* LogManagerPtr;
 
   private:
     LevelList _Levels;
     LogFacilityList _Listeners;
-    static LogManager* _ptr;
+
+    static LogManagerPtr _ptr;
 
    /**
     * Private constructor. Is a Singleton.
@@ -94,7 +100,7 @@ class LogManager
     * @param level LogLevel priority.
     * @return Registered LogLevel of specified priority.
     */
-    LogLevel const getLogLevelByPriority(unsigned int level) const;
+    LogLevel* const getLogLevelByPriority(unsigned int level) const;
    /**
     * Returns the priority of the last registered LogLevel. (_Levels.size() - 1)
     * @return Priority of last registered LogLevel. Least priority level.
@@ -109,7 +115,7 @@ class LogManager
    /**
     * Publish message to all log facilities.
     */
-    void addLogMessage(std::string message, unsigned int level);
+    void addLogMessage(std::string message, LogLevel level);
    /**
     * Publish message to a certain facility.
     */
@@ -117,7 +123,7 @@ class LogManager
    /**
     * Publish message to a certain facility.
     */
-    void addLogMessageTo(std::string message, unsigned int level, LogFacilityProvider* facility);
+    void addLogMessageTo(std::string message, LogLevel level, LogFacilityProvider* facility);
 
 // Manage log facilities
    /**
@@ -127,7 +133,7 @@ class LogManager
 
 // Static memebers
     static void create() { _ptr = new LogManager(); }
-    static LogManager* getSingletonPtr() { return _ptr; }
+    static LogManagerPtr getSingletonPtr() { return _ptr; }
     static void destroy() { delete _ptr; }
 };
 

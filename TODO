@@ -1,0 +1,4 @@
+ * Create some tests.
+ * Implement a method to unregister facilities.
+ * Provide more default facilities.
+ * Test in other systems than Linux.

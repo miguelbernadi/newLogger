@@ -2,9 +2,7 @@
 #define LogFacilityProvider_H_
 
 #include <string>
-
-class LogLevel;
-class LogMessage;
+#include "LogManager.h"
 
 /** \class Log
  * Abstract class to be derived by the Log backends (FileLog, CLILog...)
@@ -17,11 +15,11 @@ class LogFacilityProvider
     * Needed for message filtering. Messages with LogLevel._LevelPriority
     * higher than this are ignored.
     */
-    LogLevel _currentLevel;
+    LogLevel* _currentLevel;
 
   public:
-    Log();
-    virtual ~Log();
+    LogFacilityProvider(LogLevel* level);
+    virtual ~LogFacilityProvider();
 
     virtual std::string getLogName() const { return _LogName; }
 
@@ -39,7 +37,7 @@ class LogFacilityProvider
     * This is used to set the message filter.
     * @param level LogLevel identifier. Must be previously registered.
     */
-    virtual void setLoggingToLevel(LogLevel level);
+    virtual void setLoggingToLevel(LogLevel* level);
    /**
     * @return LogLevel corresponding to actual LogLevel.
     */
